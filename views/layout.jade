@@ -1,0 +1,12 @@
+doctype html
+html(ng-app="MainApp", page-background="http://livedoor.4.blogimg.jp/nwknews/imgs/a/6/a6b4a732.jpg")
+	head
+		meta(content="text/html", charset="UTF-8")
+		title= title
+		link(rel='stylesheet', href='/stylesheets/style.css')
+		link(rel="stylesheet", href="//netdna.bootstrapcdn.com/bootstrap/latest/css/bootstrap.min.css")
+		script(src="//ajax.googleapis.com/ajax/libs/angularjs/1.2.16/angular.min.js")
+		script(src='/socket.io/socket.io.js')
+		script(src="/javascripts/socket.js")
+	body
+		block content

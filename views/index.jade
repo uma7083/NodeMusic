@@ -1,0 +1,26 @@
+extends ./layout
+
+block content
+	h1= title
+	p Welcome to #{title}
+	div(ng-controller="ChatCtrl")
+		div(ng-show="!isInRoom")
+			form(ng-submit="roomEnterSubmit()")
+				p room
+				input(type="text", name="text", ng-model="room")
+				p name
+				input(type="text", name="text", ng-model="name")
+				p
+				input(type="submit", value="Enter")
+				input(type="reset", value="reset!")
+		div(ng-show="isInRoom")
+			p 現在このサーバーに接続している人は
+				span {{ num }}
+				|人います。
+			form(ng-submit="submit()")
+				input(type="text", name="text", ng-model="text")
+				input(type="submit", value="送信")
+				input(type="reset", value="reset!")
+			ul
+				li(ng-repeat="message in messages")
+					label {{ message.text }}
