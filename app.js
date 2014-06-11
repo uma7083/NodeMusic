@@ -69,16 +69,20 @@ var chat = io
 	.on('connection', function(socket) {
 		//	入室と回線切れで++,--なのでフラグが必要
 		var enterFlag = false;
+		var room = "";
+		var name = "";
 		//	クライアントに接続成功送信
 		socket.emit('connected');
 
+		console.log(socket);
+
 		//	入室
 		socket.on('enter_room', function(req) {
-			socket.set('room', req.room);
-			socket.set('name', req.name);
-			chat.to(req.room).emit('message', req.name + " さんが入室");
+			room = req.room;
+			name = req.name;
+			chat.to(room).emit('message', req.name + " さんが入室");
 			// クライアントを部屋に入室させる
-			socket.join(req.room);
+			socket.join(room);
 			if (!enterFlag) {
 				count++;
 				enterFlag = true;
@@ -90,15 +94,6 @@ var chat = io
 		//	メッセージ受信->送信
 		socket.on('new', function(data) {
 			console.log('message', data);
-			var room, name;
-
-			socket.get('room', function(err, _room) {
-				room = _room;
-			});
-			socket.get('name', function(err, _name) {
-				name = _name;
-			});
-
 			chat.to(room).emit('new', {text:name + ": " + data.text});
 		});
 
