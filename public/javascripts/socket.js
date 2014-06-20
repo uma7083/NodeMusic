@@ -1,4 +1,4 @@
-var app = angular.module('MainApp', []);
+var app = app || angular.module('MainApp', ['flow']);
 
 //	ChatCtrlでもsocket.ioを使用可能にするために処理
 app.factory('$socket', function ($rootScope) {
@@ -40,6 +40,7 @@ app.directive('pageBackground', function() {
     };
 });
 
+//	チャット用
 app.controller("ChatCtrl", ["$scope", "$http", "$socket", function ChatCtrl($scope, $http, $socket) {
 	//	部屋にいるかいないかでブラウザの表示が切り替わる
 	$scope.isInRoom = false;
@@ -54,11 +55,66 @@ app.controller("ChatCtrl", ["$scope", "$http", "$socket", function ChatCtrl($sco
 	//	接続人数
 	$scope.num = "0";
 
+	//	音楽ファイルキュー配列
+	$scope.queue = [];
+	$scope.queue.start = function() {
+			alert("start");
+	};
+	$scope.queue.stop = function() {
+			alert("stop");
+	};
+	$scope.queue.info = function() {
+			alert("info");
+	};
+
 	//	メッセージ送信
 	$scope.submit = function() {
 		$socket.emit('new', {text: $scope.text});
 		$scope.text = "";
 	};
+
+	//	任意メッセージ送信
+	$scope.submitMessage = function(text) {
+		$socket.emit('new', {text: text});
+	};
+
+	//	擬似的に末尾の3文字を拡張子として扱う
+	$scope.forcedExt = function(fileName) {
+		var fileBase = fileName.substr(0, fileName.length-3);
+		var fileExt = fileName.substr(-3);
+		return fileBase + '.' + fileExt;
+	}
+
+	//	音楽キューに追加
+	//	arg0	file	ng-flowのファイルオブジェクト
+	$scope.addQueue = function(file) {
+		$socket.emit('new', {text: "[" + file.name + "]をキューに追加しました。"});
+		$socket.emit('new', {text: "DEBUG: uniqueIdentifier:" + file.uniqueIdentifier});
+		$socket.emit('new', {text: "DEBUG: size:" + file.size});
+		//	音楽をキューに追加
+		$socket.emit('queue_music', {
+			name: file.name,
+			src: $scope.forcedExt(file.uniqueIdentifier),
+		});
+		//	ファイル情報の破棄
+		file.cancel();
+	};
+
+	$scope.musicSrc = "";
+	$scope.musicName = "";
+	$scope.musicAudio = false;
+	//	音楽再生開始
+	$socket.on('start_music', function(data) {
+		$scope.musicName = data.name;
+		$scope.musicAudio = true;
+		$scope.musicSrc = '/download/' + data.src;
+	});
+
+	//	音楽再生開始
+	//	現在は未使用
+	$socket.on('queue_music', function(data) {
+		queue.push(data);
+	});
 
 	//	　入室処理
 	$scope.roomEnterSubmit = function() {

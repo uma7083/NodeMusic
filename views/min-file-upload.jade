@@ -1,0 +1,74 @@
+doctype html
+html(ng-app="MainApp", flow-init, page)
+	head
+		meta(content="text/html", charset="UTF-8")
+		title= title
+		//link(rel="stylesheet", href="//netdna.bootstrapcdn.com/bootstrap/latest/css/bootstrap.min.css")
+		link(rel="stylesheet", href="http://netdna.bootstrapcdn.com/twitter-bootstrap/2.3.2/css/bootstrap-combined.min.css")
+		script(src="//ajax.googleapis.com/ajax/libs/angularjs/1.2.16/angular.min.js")
+		script(src="/javascripts/ng-flow-standalone.js")
+		//  script(src='/socket.io/socket.io.js')
+		//  script(src="/javascripts/socket.js")
+		script(src="/javascripts/file-upload.js")
+	body(flow-prevent-drop, flow-drag-enter="style={border: '5px solid green'}", flow-drag-leave="style={}", ng-style="style")
+		.container
+			h1 flow basic example
+			hr.soften
+			h2 Transfers:
+			div(ng-show="$flow.files.length")
+				p
+					a.btn.btn-small.btn-success(ng-click='$flow.resume()') All Upload
+					//a.btn.btn-small.btn-danger(ng-click='$flow.pause()') Pause
+					a.btn.btn-small.btn-info(ng-click='$flow.cancel()') All Delete
+					//span.label.label-info Size: {{$flow.getSize()}}
+					//span.label.label-info Is Uploading: {{$flow.isUploading()}}
+				table.table.table-hover.table-bordered.table-striped(flow-transfers='flow-transfers')
+					thead
+						tr
+							th #
+							th Name
+							th Size
+							//th Relative Path
+							//th Unique Identifier
+							//th #Chunks
+							th Progress
+							//th Paused
+							//th(ng-show="file.isUploading()")
+							//	Uploading
+							//th Completed
+							th Controls
+					tbody
+						tr(ng-repeat='file in transfers')
+							td {{$index+1}}
+							td {{file.name}}
+							td {{file.size}}
+							//td {{file.relativePath}}
+							//td {{file.uniqueIdentifier}}
+							//td {{file.chunks.length}}
+							td {{file.progress() * 100.0}} %
+							//td {{file.paused}}
+							//td(ng-show="file.isUploading()")
+							//	{{file.isUploading()}}/100
+							//td {{file.isComplete()}}
+							td
+								.btn-group
+									//a.btn.btn-mini.btn-warning(ng-click='file.pause()', ng-show='!file.isComplete()')
+									//	| Pause
+									//a.btn.btn-mini.btn-warning(ng-click='file.resume()', ng-show='!file.isComplete() && (file.progress() == 0)')
+									//	| Upload
+									a.btn.btn-mini.btn-danger(ng-click='file.cancel()', ng-show='!file.isComplete()')
+										| Delete
+									a.btn.btn-mini.btn-info(ng-click='file.retry()', ng-show='file.error')
+										| Retry
+			hr.soften
+			.alert(flow-drop='flow-drop', flow-drag-enter='class=\'alert-success\'', flow-drag-leave='class=\'\'', ng-class='class')
+				hr
+				hr
+				p Drag And Drop your file here
+				p Valid extension are mp3...
+				hr
+				hr
+			a(href="#", class="btn", flow-btn, flow-attrs="{accept:'audio/mp3'}")
+				| Select Music (Mp3 files)
+			//a(href="#", class="btn btn-danger", ng-show="$flow.files.length", ng-click="$flow.cancel()")
+			//	| Remove

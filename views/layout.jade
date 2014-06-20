@@ -1,12 +1,18 @@
 doctype html
-html(ng-app="MainApp", page-background="http://livedoor.4.blogimg.jp/nwknews/imgs/a/6/a6b4a732.jpg")
+
+html(ng-app="MainApp", page)
 	head
 		meta(content="text/html", charset="UTF-8")
 		title= title
 		link(rel='stylesheet', href='/stylesheets/style.css')
-		link(rel="stylesheet", href="//netdna.bootstrapcdn.com/bootstrap/latest/css/bootstrap.min.css")
+		//link(rel="stylesheet", href="//netdna.bootstrapcdn.com/bootstrap/latest/css/bootstrap.min.css")
+		link(rel="stylesheet", href="http://netdna.bootstrapcdn.com/twitter-bootstrap/2.3.2/css/bootstrap-combined.min.css")
 		script(src="//ajax.googleapis.com/ajax/libs/angularjs/1.2.16/angular.min.js")
+		script(src="/javascripts/ng-flow-standalone.js")
 		script(src='/socket.io/socket.io.js')
 		script(src="/javascripts/socket.js")
-	body
+		script(src="/javascripts/file-upload.js")
+
+	//body(flow-prevent-drop, flow-drag-enter="style={border: '5px solid green'}", flow-drag-leave="style={}", ng-style="style", page-background="/images/back.jpg")
+	body(flow-prevent-drop, flow-drag-enter="style={border: '5px solid green'}", flow-drag-leave="style={}", ng-style="style", page-background="http://ja.wallpaperswiki.org/wallpapers/2012/11/壁紙抽象的な、抽象化、テクスチャ、テクスチャ、背景、ボケ、ブルー-768x1280.jpg")
 		block content

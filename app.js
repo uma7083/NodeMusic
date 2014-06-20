@@ -1,3 +1,5 @@
+process.env.TMPDIR = 'tmp'; // to avoid the EXDEV rename error, see http://stackoverflow.com/q/21071303/76173
+
 var express = require('express');
 var path = require('path');
 var favicon = require('static-favicon');
@@ -5,8 +7,14 @@ var logger = require('morgan');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
 
+var multipart = require('connect-multiparty');
+var multipartMiddleware = multipart();
+var flow = require('./flow-node.js')('tmp');
+
 
 var routes = require('./routes/index');
+var file_upload = require('./routes/file-upload');
+//var upload = require('./routes/upload');
 
 var app = express();
 
@@ -21,7 +29,55 @@ app.use(bodyParser.urlencoded());
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
+
+
+
+
+//	flow.js関連
+//  サイズの大きいファイルは複数回に分けて分割して送信する
+// Handle uploads through Flow.js
+app.post('/upload', multipartMiddleware, function(req, res) {
+    flow.post(req, function(status, filename, original_filename, identifier) {
+        console.log('POST', status, original_filename, identifier);
+        res.send(200, {
+            // NOTE: Uncomment this funciton to enable cross-domain request.
+            //'Access-Control-Allow-Origin': '*'
+        });
+    });
+});
+
+// Handle cross-domain requests
+// NOTE: Uncomment this funciton to enable cross-domain request.
+/*
+  app.options('/upload', function(req, res){
+  console.log('OPTIONS');
+  res.send(true, {
+  'Access-Control-Allow-Origin': '*'
+  }, 200);
+  });
+*/
+
+// Handle status checks on chunks through Flow.js
+app.get('/upload', function(req, res) {
+    flow.get(req, function(status, filename, original_filename, identifier) {
+        console.log('GET', status);
+        res.send(200, (status == 'found' ? 200 : 404));
+    });
+});
+
+//  tmpディレクトリ以下のファイルを送信 
+app.get('/download/:identifier', function(req, res) {
+    flow.write(req.params.identifier, res);
+});
+
+//	簡易的な app.get app.post は app.use より上の行に書くべき?!
 app.use('/', routes);
+app.use('/file_upload', file_upload);
+//app.use('/upload', upload);
+
+
+
+
 
 /// catch 404 and forwarding to error handler
 app.use(function(req, res, next) {
@@ -54,6 +110,22 @@ app.use(function(err, req, res, next) {
 	});
 });
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 //----add
 //	以下、socket通信を行うために必要な処理
 var http = require('http');
@@ -74,7 +146,7 @@ var chat = io
 		//	クライアントに接続成功送信
 		socket.emit('connected');
 
-		console.log(socket);
+//		console.log(socket);
 
 		//	入室
 		socket.on('enter_room', function(req) {
@@ -93,20 +165,18 @@ var chat = io
 
 		//	メッセージ受信->送信
 		socket.on('new', function(data) {
-			console.log('message', data);
+			console.log('new', data);
 			chat.to(room).emit('new', {text:name + ": " + data.text});
+		});
+
+		//	音楽ファイルをキューに追加
+		socket.on('queue_music', function(data) {
+			console.log('queue_music', data);
+			chat.to(room).emit('start_music', data);
 		});
 
 		//	接続切れ
 		socket.on('disconnect', function() {
-			var room, name;
-
-			socket.get('room', function(err, _room) {
-				room = _room;
-			});
-			socket.get('name', function(err, _name) {
-				name = _name;
-			});
 			socket.leave(room);
 			chat.to(room).emit('message', name + " さんが退出");
 			if (enterFlag) {
