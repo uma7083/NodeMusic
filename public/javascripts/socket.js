@@ -42,6 +42,7 @@ app.directive('pageBackground', function() {
 
 //	チャット用
 app.controller("ChatCtrl", ["$scope", "$http", "$socket", function ChatCtrl($scope, $http, $socket) {
+
 	//	部屋にいるかいないかでブラウザの表示が切り替わる
 	$scope.isInRoom = false;
 	//	デフォルトメッセージ
@@ -153,5 +154,21 @@ app.controller("ChatCtrl", ["$scope", "$http", "$socket", function ChatCtrl($sco
 	//	エラー処理
 	$socket.on('error', function(e) {
 		console.log(String(e))
+		});
+	
+	//Aya加筆部分：効果音機能に必要
+	
+	$scope.se = document.getElementById('SE1');
+	
+	$scope.clicked = function()
+	{		
+		$socket.emit('SETEST');
+	}
+	
+	$socket.on('SEON', function(){
+		$scope.se.currentTime = 0;
+		$scope.se.play();
 	});
+		
+
 }]);

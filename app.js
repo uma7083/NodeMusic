@@ -186,6 +186,12 @@ var chat = io
 			chat.emit('now_num', {num: count});
 			console.log('disconnect');
 		});
+		
+		//ここよりAya加筆部分：効果音機能
+		socket.on('SETEST', function() {
+			chat.to(room).emit('SEON');
+		});
 	});
+	
 
 module.exports = app;

@@ -20,6 +20,9 @@ block content
 				|人います。
 			//	          /download/9111483-DPDP.m4a
 			//audio(ng-src="/download/9111483-DP.m4a", controls, autoplay)
+			//効果音ボタン（暫定）
+			input(type="button", ng-click="clicked()", value="SE")
+			audio#SE1(ng-src="./Jamy.mp3")
 			div(ng-show="musicAudio")
 				h2 {{musicName}}
 				//	ng-src の場合は {{}} が必須?!
