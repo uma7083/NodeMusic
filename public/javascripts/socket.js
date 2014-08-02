@@ -156,19 +156,33 @@ app.controller("ChatCtrl", ["$scope", "$http", "$socket", function ChatCtrl($sco
 		console.log(String(e))
 		});
 	
-	//Aya加筆部分：効果音機能に必要
+	//Aya//BGMの初期音量が最大なので小さく
+	document.getElementById('BGM').volume= 0.2;	
 	
-	$scope.se = document.getElementById('SE1');
+	//Aya//効果音機能
+	$scope.seList = 
+	[
+		{ label:" Sn ", src:new Audio("./SE/se_maoudamashii_instruments_drum2_snare-noSilence.mp3")},
+		{ label:"H.H", src:new Audio("./SE/se_maoudamashii_instruments_drum2_hat-noSilence.mp3")},
+		{ label:"Kick", src:new Audio("./SE/se_maoudamashii_instruments_drum1_bassdrum1-noSilence.mp3")},
+		{ label:"Clap", src:new Audio("./SE/Clap01-2-noSilence.mp3")},
+		{ label:"Snap", src:new Audio("./SE/Finger Snap01-4-noSilence.mp3")}		
+	];
+		
+	$scope.seList.play = function(index)
+	{
+		$scope.seList[index].src.currentTime = 0;
+		$scope.seList[index].src.play();
+	};
 	
-	$scope.clicked = function()
-	{		
-		$socket.emit('SETEST');
+	$scope.clicked = function(index)
+	{	
+		$socket.emit('ring_se',{ seIndex:index });
 	}
 	
-	$socket.on('SEON', function(){
-		$scope.se.currentTime = 0;
-		$scope.se.play();
+	$socket.on('ring_se', function(data){
+		$scope.seList.play(data.seIndex);
 	});
-		
+
 
 }]);

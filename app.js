@@ -188,8 +188,9 @@ var chat = io
 		});
 		
 		//ここよりAya加筆部分：効果音機能
-		socket.on('SETEST', function() {
-			chat.to(room).emit('SEON');
+		socket.on('ring_se', function(data) {
+			console.log('ring_se ' + data.seIndex);
+			chat.to(room).emit('ring_se', data);
 		});
 	});
 	
