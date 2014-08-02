@@ -22,4 +22,8 @@ Queue.prototype.toString = function() {
 	return '[' + this.__a.join(',') + ']';
 }
 
+Queue.prototype.getArray = function(){
+	return this.__a;
+}
+
 module.exports = Queue;

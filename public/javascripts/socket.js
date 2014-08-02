@@ -184,9 +184,18 @@ app.controller("ChatCtrl", ["$scope", "$http", "$socket", function ChatCtrl($sco
 		$scope.seList.play(data.seIndex);
 	});
 
-	//Queueの次のBGMを再生開始する関数
+	//Aya//Queueの次のBGMを再生開始する関数
 	$scope.nextMusic = function(){
 		$socket.emit('next_music');
 	}
+	
+	
+	//Aya//投稿や再生によってキューが更新されたら表示が反映される
+	$scope.musicQueue = [];
+	
+	$socket.on('music_queue_update', function(data) {
+		$scope.musicQueue = data;
+		console.log("queueUpdate" + data);
+	});
 
 }]);

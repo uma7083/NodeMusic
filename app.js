@@ -199,6 +199,7 @@ var chat = io
 		socket.on('queue_music', function(data) {
 			console.log('queue_music', data);
 			roomProperty[room].queue.enqueue(data);
+			chat.to(room).emit('music_queue_update', roomProperty[room].queue.getArray());
 			//chat.to(room).emit('start_music', data);
 		});
 		
@@ -216,6 +217,7 @@ var chat = io
 			{
 				chat.to(room).emit('start_music', data);
 				console.log("dequeue music");
+				chat.to(room).emit('music_queue_update', roomProperty[room].queue.getArray());	
 			}
 			else
 			{
@@ -235,7 +237,7 @@ var chat = io
 			console.log('disconnect');
 		});
 		
-		//ここよりAya加筆部分：効果音機能
+		//Aya//効果音機能
 		socket.on('ring_se', function(data) {
 			console.log('ring_se ' + data.seIndex);
 			chat.to(room).emit('ring_se', data);
