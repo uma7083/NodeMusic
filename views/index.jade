@@ -24,6 +24,7 @@ block content
 			div(style="display: inline", ng-repeat="se in seList")
 				button(class="btn btn-small", ng-click="clicked($index)") {{se.label}}
 				|  
+			button.btn-primary(ng-click="nextMusic()") nextMusic
 			div(ng-show="musicAudio")
 				h2 {{musicName}}
 				//	ng-src の場合は {{}} が必須?!

@@ -184,5 +184,9 @@ app.controller("ChatCtrl", ["$scope", "$http", "$socket", function ChatCtrl($sco
 		$scope.seList.play(data.seIndex);
 	});
 
+	//Queueの次のBGMを再生開始する関数
+	$scope.nextMusic = function(){
+		$socket.emit('next_music');
+	}
 
 }]);

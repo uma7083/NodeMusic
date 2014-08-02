@@ -11,7 +11,8 @@ var multipart = require('connect-multiparty');
 var multipartMiddleware = multipart();
 var flow = require('./flow-node.js')('tmp');
 
-
+//queue
+var queue = require('./routes/queue.js'); 
 var routes = require('./routes/index');
 var file_upload = require('./routes/file-upload');
 //var upload = require('./routes/upload');
@@ -136,6 +137,8 @@ server.listen(3000)
 //	現在の接続数
 var count = 0;
 
+var roomProperty = [];
+
 var chat = io
 	.of('/chat')
 	.on('connection', function(socket) {
@@ -143,6 +146,7 @@ var chat = io
 		var enterFlag = false;
 		var room = "";
 		var name = "";
+
 		//	クライアントに接続成功送信
 		socket.emit('connected');
 
@@ -159,6 +163,28 @@ var chat = io
 				count++;
 				enterFlag = true;
 			}
+			
+			//Aya//部屋管理用のいろいろを新規作成したり更新したり
+			if(room in roomProperty)
+			{
+				roomProperty[room].count += 1;
+				
+				console.log(roomProperty[room].count + "人部屋に入りました");
+			}
+			else
+			{
+				roomProperty[room] =
+				{
+					count:0,			//部屋にいる人数
+					endMusic:0,			//音楽を聴き終わった人数？
+					queue:new queue()	//音楽ファイルキュー
+				};
+				
+				roomProperty[room].count += 1;
+				
+				console.log(roomProperty[room].count + "人部屋に入りました:部屋新規作成");
+			}
+			
 			chat.emit('now_num', {num: count});
 			socket.emit('enter_room_res', {result: true})
 		});
@@ -169,10 +195,32 @@ var chat = io
 			chat.to(room).emit('new', {text:name + ": " + data.text});
 		});
 
-		//	音楽ファイルをキューに追加
+		//Aya//音楽ファイルをキューに追加 roomProperty[room].queueにenqueueするだけ
 		socket.on('queue_music', function(data) {
 			console.log('queue_music', data);
-			chat.to(room).emit('start_music', data);
+			roomProperty[room].queue.enqueue(data);
+			//chat.to(room).emit('start_music', data);
+		});
+		
+		//Aya//queueから1個取り出してstart_musicする なければ何もしない
+		socket.on('next_music', function(){
+			var data;
+		
+			if(!roomProperty[room].queue)
+			{
+				console.log("noQueue:"+room+", "+name);
+				return;
+			}
+		
+			if(data = roomProperty[room].queue.dequeue())
+			{
+				chat.to(room).emit('start_music', data);
+				console.log("dequeue music");
+			}
+			else
+			{
+				console.log("queue empty.");
+			}
 		});
 
 		//	接続切れ
